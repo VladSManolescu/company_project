@@ -1,9 +1,16 @@
 
 import json
 import psycopg2 as ps
+import base64 as b64
 
 with open("config.json", 'r') as f:
     config = json.loads(f.read())
+    config['password'] = b64.b64decode(config['password']).decode()
+    pass
+
+
+
+
 
 
 with ps.connect(**config) as conn:
