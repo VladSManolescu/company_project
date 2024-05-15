@@ -3,7 +3,7 @@ import json
 import psycopg2 as ps
 import base64 as b64
 
-
+budget_cap = 0.8
 def initialise_config():
     with open("config.json", 'r') as f:
         config = json.loads(f.read())
@@ -35,7 +35,7 @@ def execute_query(sql_query: str, config: dict):
             with conn.cursor() as cursor:
                 cursor.execute(sql_query)
                 print("Successfully executed!")
-                return True
+                return cursor.statusmessage
     except Exception as e:
         print(f"Failure on reading from database. Error : {e}")
         return False
@@ -44,7 +44,7 @@ def execute_query(sql_query: str, config: dict):
 
 
 if __name__ == '__main__':
-    budget_cap = 0.8
+
     MENU = """
     1. Show all employees
     2. Show all employees by department
@@ -91,7 +91,8 @@ if __name__ == '__main__':
             new_salary = emp['salary'] + emp['salary'] * float(percentage)/100
 
             if new_salary < budget[0]['sum'] * budget_cap:
-                execute_query(f"UPDATE company.employees set salary = {new_salary} where emp_id = {emp_pick}", config)
+                response = execute_query(f"UPDATE company.employees set salary = {new_salary} where emp_id = {emp_pick}", config)
+                print(response)
             else:
                 print("Not enough money for the raise")
 
@@ -129,7 +130,7 @@ if __name__ == '__main__':
             emp_pick = input()
             consent = input("Are you want to fire this employee? Y/N ")
             if consent.lower() == "y":
-                execute_query(f"DELETE from company.employees where emp_id = {emp_pick}", config)
-
+                response = execute_query(f"DELETE from company.employees where emp_id = {emp_pick}", config)
+                print(response)
         case _:
             print("Wrong option")
